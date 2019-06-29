@@ -42,9 +42,9 @@ query {
   }
 }
 ```
-*Benchmark: 10 requests in 6.844s (local server)*
+**Benchmark: 10 requests in 6.844s (local server)**
 
-A query to return the sender, recipient and amount sent on every transfer of the `RALLY` token (note: token names/symbols are not unique. If you wnat a particular token, you'll have to specify the address)
+A query to return the sender, recipient and amount sent on every transfer of the `RALLY` token (note: token names/symbols are not unique. If you want a particular token, you'll have to specify the address)
 ```
 query {
   tokens(where: {symbol: {_eq: "RALLY"}}) {
@@ -56,12 +56,12 @@ query {
   }
 }
 ```
-*Benchmark: 10 requests in 1.221s (local server)*
+**Benchmark: 10 requests in 1.221s (local server)**
 
 ### Design Choices
-I used Hasura for the GraphQL server because of its lightweight footprint. Unlike alternatives like Prisma, Hasura is a compiler that sits infront of a Postgres database. It compiles GraphQL queries into SQL queries. This makes Hasura very fast and capable of handling complex queries all while using very little memory and less CPU power. Hasura is also easy to scale both vertically and horizontally.
+I used Hasura for the GraphQL server because of its lightweight footprint. Unlike alternatives like Prisma, Hasura is a compiler that sits infront of a Postgres database. It compiles GraphQL queries into SQL queries. This makes Hasura very fast and capable of handling complex queries all while using very little memory and less CPU power than alternatives. Hasura is also easy to scale both vertically and horizontally.
 
-I used javascript/node.js to write the ingestion scripts because its ease of use and widespread adoption among web developers. 
+I used javascript/node.js to write the ingestion scripts because of its ease of use and widespread adoption among web developers. 
 
 A note about the scripts: we insert the records into the database in batches of 1000 to avoid the overhead of each commit. These inserts could be run sequentially if depending on resource constraints.
 
@@ -76,6 +76,8 @@ A note about the scripts: we insert the records into the database in batches of 
   - Insert 5000 transfer records: 2.211s
 
 ### Deployment
-I've deployed the a Postgres instance as well as a Hasura server on Heroku, which you can see [Here](https://terminal-backend-holmgren.herokuapp.com/console/)
+I've deployed a Postgres instance as well as a Hasura server on Heroku, which you can see and interact with [Here](https://terminal-backend-holmgren.herokuapp.com/console/)
 
 The free tier allows only 10000 entires in the Postgres DB, so the queries will be by no means fully functional. However this deployment could be easily scaled up to accomodate more data.
+
+Offering this as a production application I would use the same stack (Postgres/Hasura deployed on Heroku). However, depending how the data comes in in production, the ingestion scripts could be automated. They could be set to run on GCS everytime an object is added to one of the relevant buckets using GCS Triggers. The CSV data can be streamed directly from GCS to the Postgres DB (I was planning on doing that here, but was having issues with the permissions so opted to upload from local CSVs). Updates to the tables/relationships can be done directly from the Hasura console.
